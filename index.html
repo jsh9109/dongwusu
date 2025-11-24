@@ -2326,84 +2326,84 @@ const fullAnimalReports = {
             }
         }
         
-       2329    function showFullReport() {
-2330        const result = JSON.parse(sessionStorage.getItem('testResult'));
-2331        const reportData = fullAnimalReports[result.typeCode] || fullAnimalReports['SGZL'];
-2332        
-2333        document.getElementById('freeResultPage').classList.add('hidden');
-2334        document.getElementById('fullReportPage').classList.remove('hidden');
-2335        
-2336        // 更新顶部人格信息
-2337        document.getElementById('fullAnimalIcon').textContent = result.animalIcon;
-2338        document.getElementById('fullAnimalName').textContent = `${result.animalName} (${result.typeCode})`;
-2339        
-2340        // 第一部分:深度心理分析
-2341        document.querySelector('.report-section:nth-of-type(1) h4:nth-of-type(1)').textContent = `你的原型:"${reportData.archetype}"`;
-2342        document.querySelector('.report-section:nth-of-type(1) p:nth-of-type(1)').textContent = reportData.coreDesc;
-2343        document.querySelector('.report-section:nth-of-type(1) p:nth-of-type(2)').textContent = reportData.coreDrive;
-2344        
-2345        // 第二部分:16型动物人格全图鉴(保持静态,只标记当前类型)
-2346        const personalityTypes = document.querySelectorAll('.personality-type');
-2347        personalityTypes.forEach(type => {
-2348            type.classList.remove('current');
-2349            const typeName = type.querySelector('.type-name');
-2350            if (typeName && typeName.textContent === reportData.archetype) {
-2351                type.classList.add('current');
-2352                type.querySelector('.type-number').textContent = '⭐ 你在这里';
-2353            }
-2354        });
-2355        
-2356        // 第三部分:专属行动方案
-2357        document.querySelector('.action-plan h4').textContent = reportData.actionPlan.title;
-2358        const actionPlanUl = document.querySelector('.action-plan ul');
-2359        actionPlanUl.innerHTML = '';
-2360        reportData.actionPlan.steps.forEach(step => {
-2361            const li = document.createElement('li');
-2362            li.textContent = step;
-2363            actionPlanUl.appendChild(li);
-2364        });
-2365        
-2366        // 沟通话术
-2367        const commSection = document.querySelector('.report-section:nth-of-type(3)');
-2368        let commHTML = '<h4>高效沟通话术 (专用)</h4>';
-2369        reportData.communication.forEach(comm => {
-2370            commHTML += `
-2371            <p style="background: #e8f5e9; padding: 15px; border-radius: 8px; color: #2e7d32; margin-top: 15px;">
-2372                <strong>场景:${comm.scene}</strong><br>
-2373                ❌ ${comm.wrong}<br>
-2374                ✅ ${comm.right}
-2375            </p>`;
-2376        });
-2377        commSection.innerHTML += commHTML;
-2378        
-2379        // 第四部分:成长资源包
-2380        const resourceCards = document.querySelectorAll('.resource-card');
-2381        resourceCards[0].querySelector('.resource-list').innerHTML = reportData.books.map((b, i) => `${i+1}. ${b}`).join('<br>');
-2382        resourceCards[1].querySelector('.resource-list').innerHTML = reportData.courses.map((c, i) => `${i+1}. ${c}`).join('<br>');
-2383        resourceCards[2].querySelector('.resource-list').innerHTML = reportData.tools.map((t, i) => `${i+1}. ${t}`).join('<br>');
-2384        
-2385        // 第五部分:避坑指南
-2386        document.querySelector('.report-section:nth-of-type(5) h3').textContent = `⚠️ "${reportData.archetype}"的避坑指南`;
-2387        
-2388        const dontsUl = document.querySelector('.donts-card ul');
-2389        dontsUl.innerHTML = '';
-2390        reportData.donts.forEach((dont, i) => {
-2391            const li = document.createElement('li');
-2392            li.innerHTML = `<strong>${i+1}. ${dont.title}</strong><br>${dont.desc}`;
-2393            dontsUl.appendChild(li);
-2394        });
-2395        
-2396        const dosUl = document.querySelector('.dos-card ul');
-2397        dosUl.innerHTML = '';
-2398        reportData.dos.forEach((d, i) => {
-2399            const li = document.createElement('li');
-2400            li.innerHTML = `<strong>${i+1}. ${d.title}</strong><br>${d.desc}`;
-2401            dosUl.appendChild(li);
-2402        });
-2403        
-2404        drawRadarChart('fullRadarChart', result.scores);
-2405        window.scrollTo(0, 0);
-2406    }
+function showFullReport() {
+    const result = JSON.parse(sessionStorage.getItem('testResult'));
+    const reportData = fullAnimalReports[result.typeCode] || fullAnimalReports['SGZL'];
+    
+    document.getElementById('freeResultPage').classList.add('hidden');
+    document.getElementById('fullReportPage').classList.remove('hidden');
+    
+    // 更新顶部人格信息
+    document.getElementById('fullAnimalIcon').textContent = result.animalIcon;
+    document.getElementById('fullAnimalName').textContent = `${result.animalName} (${result.typeCode})`;
+    
+    // 第一部分:深度心理分析
+    document.querySelector('.report-section:nth-of-type(1) h4:nth-of-type(1)').textContent = `你的原型:"${reportData.archetype}"`;
+    document.querySelector('.report-section:nth-of-type(1) p:nth-of-type(1)').textContent = reportData.coreDesc;
+    document.querySelector('.report-section:nth-of-type(1) p:nth-of-type(2)').textContent = reportData.coreDrive;
+    
+    // 第二部分:16型动物人格全图鉴(保持静态,只标记当前类型)
+    const personalityTypes = document.querySelectorAll('.personality-type');
+    personalityTypes.forEach(type => {
+        type.classList.remove('current');
+        const typeName = type.querySelector('.type-name');
+        if (typeName && typeName.textContent === reportData.archetype) {
+            type.classList.add('current');
+            type.querySelector('.type-number').textContent = '⭐ 你在这里';
+        }
+    });
+    
+    // 第三部分:专属行动方案
+    document.querySelector('.action-plan h4').textContent = reportData.actionPlan.title;
+    const actionPlanUl = document.querySelector('.action-plan ul');
+    actionPlanUl.innerHTML = '';
+    reportData.actionPlan.steps.forEach(step => {
+        const li = document.createElement('li');
+        li.textContent = step;
+        actionPlanUl.appendChild(li);
+    });
+    
+    // 沟通话术
+    const commSection = document.querySelector('.report-section:nth-of-type(3)');
+    let commHTML = '<h4>高效沟通话术 (专用)</h4>';
+    reportData.communication.forEach(comm => {
+        commHTML += `
+        <p style="background: #e8f5e9; padding: 15px; border-radius: 8px; color: #2e7d32; margin-top: 15px;">
+            <strong>场景:${comm.scene}</strong><br>
+            ❌ ${comm.wrong}<br>
+            ✅ ${comm.right}
+        </p>`;
+    });
+    commSection.innerHTML += commHTML;
+    
+    // 第四部分:成长资源包
+    const resourceCards = document.querySelectorAll('.resource-card');
+    resourceCards[0].querySelector('.resource-list').innerHTML = reportData.books.map((b, i) => `${i+1}. ${b}`).join('<br>');
+    resourceCards[1].querySelector('.resource-list').innerHTML = reportData.courses.map((c, i) => `${i+1}. ${c}`).join('<br>');
+    resourceCards[2].querySelector('.resource-list').innerHTML = reportData.tools.map((t, i) => `${i+1}. ${t}`).join('<br>');
+    
+    // 第五部分:避坑指南
+    document.querySelector('.report-section:nth-of-type(5) h3').textContent = `⚠️ "${reportData.archetype}"的避坑指南`;
+    
+    const dontsUl = document.querySelector('.donts-card ul');
+    dontsUl.innerHTML = '';
+    reportData.donts.forEach((dont, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${i+1}. ${dont.title}</strong><br>${dont.desc}`;
+        dontsUl.appendChild(li);
+    });
+    
+    const dosUl = document.querySelector('.dos-card ul');
+    dosUl.innerHTML = '';
+    reportData.dos.forEach((d, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${i+1}. ${d.title}</strong><br>${d.desc}`;
+        dosUl.appendChild(li);
+    });
+    
+    drawRadarChart('fullRadarChart', result.scores);
+    window.scrollTo(0, 0);
+}
         
         function showAdminPanel() {
             document.getElementById('cardVerifyPage').classList.add('hidden');
@@ -2555,5 +2555,6 @@ const fullAnimalReports = {
 </body>
 
 </html>
+
 
 

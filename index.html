@@ -2447,7 +2447,7 @@ personalityTypes.forEach(type => {
         // 如果没有,创建标题
         if (!commH4) {
             commH4 = document.createElement('h4');
-            commH4.textContent = '高效沟通话术 (专用)';
+ commH4.textContent = `高效沟通话术 (${reportData.archetype}专用)`;
             // 插入到第一个h4后面
             const firstH4 = thirdSection.querySelector('h4');
             if (firstH4 && firstH4.nextSibling) {
@@ -2663,6 +2663,7 @@ personalityTypes.forEach(type => {
 </body>
 
 </html>
+
 
 
 

@@ -2337,69 +2337,122 @@ function showFullReport() {
     document.getElementById('fullAnimalIcon').textContent = result.animalIcon;
     document.getElementById('fullAnimalName').textContent = `${result.animalName} (${result.typeCode})`;
     
-    // 第一部分:深度心理分析
-    document.querySelector('.report-section:nth-of-type(1) h4:nth-of-type(1)').textContent = `你的原型:"${reportData.archetype}"`;
-    document.querySelector('.report-section:nth-of-type(1) p:nth-of-type(1)').textContent = reportData.coreDesc;
-    document.querySelector('.report-section:nth-of-type(1) p:nth-of-type(2)').textContent = reportData.coreDrive;
+    // 第一部分:深度心理分析 - 使用更安全的选择器
+    const reportSections = document.querySelectorAll('.report-section');
+    if (reportSections.length > 0) {
+        const firstSection = reportSections[0];
+        const h4s = firstSection.querySelectorAll('h4');
+        const ps = firstSection.querySelectorAll('p');
+        
+        if (h4s.length > 0) h4s[0].textContent = `你的原型:"${reportData.archetype}"`;
+        if (h4s.length > 1) h4s[1].textContent = '你的核心驱动力';
+        if (ps.length > 0) ps[0].textContent = reportData.coreDesc;
+        if (ps.length > 1) ps[1].textContent = reportData.coreDrive;
+    }
     
     // 第二部分:16型动物人格全图鉴(保持静态,只标记当前类型)
     const personalityTypes = document.querySelectorAll('.personality-type');
     personalityTypes.forEach(type => {
         type.classList.remove('current');
-        const typeName = type.querySelector('.type-name');
-        if (typeName && typeName.textContent === reportData.archetype) {
+        const typeNameEl = type.querySelector('.type-name');
+        if (typeNameEl && typeNameEl.textContent.trim() === reportData.archetype) {
             type.classList.add('current');
-            type.querySelector('.type-number').textContent = '⭐ 你在这里';
+            const typeNumberEl = type.querySelector('.type-number');
+            if (typeNumberEl) typeNumberEl.textContent = '⭐ 你在这里';
         }
     });
     
     // 第三部分:专属行动方案
-    document.querySelector('.action-plan h4').textContent = reportData.actionPlan.title;
-    const actionPlanUl = document.querySelector('.action-plan ul');
-    actionPlanUl.innerHTML = '';
-    reportData.actionPlan.steps.forEach(step => {
-        const li = document.createElement('li');
-        li.textContent = step;
-        actionPlanUl.appendChild(li);
-    });
+    const actionPlanH4 = document.querySelector('.action-plan h4');
+    if (actionPlanH4) actionPlanH4.textContent = reportData.actionPlan.title;
     
-    // 沟通话术
-    const commSection = document.querySelector('.report-section:nth-of-type(3)');
-    let commHTML = '<h4>高效沟通话术 (专用)</h4>';
-    reportData.communication.forEach(comm => {
-        commHTML += `
-        <p style="background: #e8f5e9; padding: 15px; border-radius: 8px; color: #2e7d32; margin-top: 15px;">
-            <strong>场景:${comm.scene}</strong><br>
-            ❌ ${comm.wrong}<br>
-            ✅ ${comm.right}
-        </p>`;
-    });
-    commSection.innerHTML += commHTML;
+    const actionPlanUl = document.querySelector('.action-plan ul');
+    if (actionPlanUl) {
+        actionPlanUl.innerHTML = '';
+        reportData.actionPlan.steps.forEach(step => {
+            const li = document.createElement('li');
+            li.textContent = step;
+            actionPlanUl.appendChild(li);
+        });
+    }
+    
+    // 沟通话术 - 添加到行动方案后面
+    if (reportSections.length >= 3) {
+        const thirdSection = reportSections[2];
+        
+        // 先清除原有的沟通话术内容(如果有)
+        const existingComm = thirdSection.querySelectorAll('p[style*="background: #e8f5e9"]');
+        existingComm.forEach(p => p.remove());
+        
+        // 检查是否已有"高效沟通话术"标题
+        let commH4 = Array.from(thirdSection.querySelectorAll('h4')).find(h4 => 
+            h4.textContent.includes('高效沟通话术') || h4.textContent.includes('沟通话术')
+        );
+        
+        // 如果没有,创建标题
+        if (!commH4) {
+            commH4 = document.createElement('h4');
+            commH4.textContent = '高效沟通话术 (专用)';
+            // 插入到第一个h4后面
+            const firstH4 = thirdSection.querySelector('h4');
+            if (firstH4 && firstH4.nextSibling) {
+                thirdSection.insertBefore(commH4, firstH4.nextSibling);
+            } else {
+                thirdSection.appendChild(commH4);
+            }
+        }
+        
+        // 添加沟通话术内容
+        reportData.communication.forEach(comm => {
+            const p = document.createElement('p');
+            p.style.cssText = 'background: #e8f5e9; padding: 15px; border-radius: 8px; color: #2e7d32; margin-top: 15px;';
+            p.innerHTML = `
+                <strong>场景:${comm.scene}</strong><br>
+                ❌ ${comm.wrong}<br>
+                ✅ ${comm.right}
+            `;
+            commH4.parentNode.insertBefore(p, commH4.nextSibling);
+        });
+    }
     
     // 第四部分:成长资源包
     const resourceCards = document.querySelectorAll('.resource-card');
-    resourceCards[0].querySelector('.resource-list').innerHTML = reportData.books.map((b, i) => `${i+1}. ${b}`).join('<br>');
-    resourceCards[1].querySelector('.resource-list').innerHTML = reportData.courses.map((c, i) => `${i+1}. ${c}`).join('<br>');
-    resourceCards[2].querySelector('.resource-list').innerHTML = reportData.tools.map((t, i) => `${i+1}. ${t}`).join('<br>');
+    if (resourceCards.length >= 3) {
+        const booksList = resourceCards[0].querySelector('.resource-list');
+        const coursesList = resourceCards[1].querySelector('.resource-list');
+        const toolsList = resourceCards[2].querySelector('.resource-list');
+        
+        if (booksList) booksList.innerHTML = reportData.books.map((b, i) => `${i+1}. ${b}`).join('<br>');
+        if (coursesList) coursesList.innerHTML = reportData.courses.map((c, i) => `${i+1}. ${c}`).join('<br>');
+        if (toolsList) toolsList.innerHTML = reportData.tools.map((t, i) => `${i+1}. ${t}`).join('<br>');
+    }
     
     // 第五部分:避坑指南
-    document.querySelector('.report-section:nth-of-type(5) h3').textContent = `⚠️ "${reportData.archetype}"的避坑指南`;
+    if (reportSections.length >= 5) {
+        const fifthSection = reportSections[4];
+        const h3 = fifthSection.querySelector('h3');
+        if (h3) h3.textContent = `⚠️ "${reportData.archetype}"的避坑指南`;
+    }
     
     const dontsUl = document.querySelector('.donts-card ul');
-    dontsUl.innerHTML = '';
-    reportData.donts.forEach((dont, i) => {
-        const li = document.createElement('li');
-        li.innerHTML = `<strong>${i+1}. ${dont.title}</strong><br>${dont.desc}`;
-        dontsUl.appendChild(li);
-    });
+    if (dontsUl) {
+        dontsUl.innerHTML = '';
+        reportData.donts.forEach((dont, i) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${i+1}. ${dont.title}</strong><br>${dont.desc}`;
+            dontsUl.appendChild(li);
+        });
+    }
     
     const dosUl = document.querySelector('.dos-card ul');
-    dosUl.innerHTML = '';
-    reportData.dos.forEach((d, i) => {
-        const li = document.createElement('li');
-        li.innerHTML = `<strong>${i+1}. ${d.title}</strong><br>${d.desc}`;
-        dosUl.appendChild(li);
-    });
+    if (dosUl) {
+        dosUl.innerHTML = '';
+        reportData.dos.forEach((d, i) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${i+1}. ${d.title}</strong><br>${d.desc}`;
+            dosUl.appendChild(li);
+        });
+    }
     
     drawRadarChart('fullRadarChart', result.scores);
     window.scrollTo(0, 0);
@@ -2555,6 +2608,7 @@ function showFullReport() {
 </body>
 
 </html>
+
 
 
 

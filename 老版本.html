@@ -6,7 +6,7 @@
     <title>动物塑人格测评 - 发现你的内在动物原型</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* ================= 森系视觉系统 ================= */
+        /* ================= 森系视觉系统 (保持不变) ================= */
         :root {
             --primary: #2D6A4F;       /* 森林深绿 */
             --primary-light: #52B788;  /* 嫩芽绿 */
@@ -368,23 +368,40 @@
     </div>
     
     <div id="adminPage" class="card hidden">
-        <input type="password" id="adminPwd" placeholder="密码" style="width:100%; padding:10px; margin-bottom:10px;">
-        <button onclick="checkAdmin()" class="btn-start">登录</button>
-        <div id="adminContent" style="margin-top:20px;"></div>
-        <button onclick="location.reload()" style="margin-top:20px; border:none; background:none; color:#666;">返回</button>
+        <h3 style="margin-bottom:15px; color:#333;">管理员后台</h3>
+        <input type="password" id="adminPwd" placeholder="请输入管理员密码" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ccc; border-radius:5px;">
+        <button onclick="checkAdmin()" class="btn-start" style="padding:10px; font-size:16px;">登录后台</button>
+        <div id="adminContent" style="margin-top:20px; display:none;">
+            <p><strong>当前有效卡号列表：</strong></p>
+            <textarea id="dbView" style="width:100%; height:200px; margin-top:10px; padding:10px; border:1px solid #ddd;" readonly></textarea>
+            <p style="font-size:12px; color:#666; margin-top:5px;">(请直接在代码的 CARD_DATABASE 数组中添加新卡号)</p>
+        </div>
+        <button onclick="location.reload()" style="margin-top:20px; border:none; background:none; color:#666;">返回主页</button>
     </div>
 
 </div>
 
 <script>
+    // ================= 配置区 =================
     const CONFIG = {
-        MASTER_CODE: "GEMINI-MASTER",
-        ADMIN_PWD: "admin", 
+        MASTER_CODE: "GEMINI-MASTER", // 超级管理员卡号
+        ADMIN_PWD: "lss900201",       // 【已修改】管理员密码
         SERVER_KEY: "SCT303445TGU9j8Q5VLg6rT7eryLe8L41v",
-        ALIPAY_URL: "https://qr.alipay.com/tsx15981nt9c4aydmvo2h3d",
-        PAN_LINK: "https://pan.baidu.com/s/1TPexZexAwxC-is2dfD_LeA",
-        PAN_CODE: "8888"
+        ALIPAY_URL: "https://qr.alipay.com/tsx15981nt9c4aydmvo2h3d"
     };
+
+    // ================= 卡号数据库 (请在这里维护你的卡号) =================
+    // 注意：所有的卡号都要用英文引号 "" 包裹，并用逗号 , 隔开
+    const CARD_DATABASE = [
+        "GEMINI-MASTER", // 系统测试号
+        "VIP8888",       // 示例卡号1
+        "SVIP666",       // 示例卡号2
+        "TEST2026",      // 示例卡号3
+        // ↓↓↓ 请在下面粘贴你以前的所有卡号 ↓↓↓
+        
+        
+        // ↑↑↑ 粘贴区域结束 ↑↑↑
+    ];
 
     const dimensionNames = ['支配/随和', '独立/合群', '机智/忠诚', '灵活/规律'];
     
@@ -452,9 +469,25 @@
 
     let state = { qIdx: 0, ans: [], code: '' };
 
+    // 【修改点】核心验证逻辑
     function verifyCard() {
         const c = document.getElementById('cardCode').value.trim();
-        if(!c) return alert('请输入卡号');
+        const errorMsg = document.getElementById('errorMessage');
+        
+        if(!c) {
+            errorMsg.innerText = '⚠️ 请输入测评卡号';
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        // 验证卡号是否存在于数据库中
+        if (!CARD_DATABASE.includes(c)) {
+            errorMsg.innerText = '❌ 无效的卡号，请联系管理员';
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        // 验证通过
         state.code = c;
         document.getElementById('verifyPage').classList.add('hidden');
         document.getElementById('testPage').classList.remove('hidden');
@@ -626,16 +659,26 @@
     }
 
     function scrollToPay() { document.getElementById('paySection').scrollIntoView({behavior:'smooth'}); }
-    function scrollToQR() { document.querySelector('.qr-section').scrollIntoView({behavior:'smooth'}); }
+    function scrollToQR() { document.querySelector('.qr-row').scrollIntoView({behavior:'smooth'}); }
     function aliPay() { window.location.href = CONFIG.ALIPAY_URL; }
     function copyWx() { navigator.clipboard.writeText("HCH91178").then(()=>{alert('微信号已复制！\n即将跳转微信...'); setTimeout(()=>{window.location.href="weixin://";},500);}).catch(()=>alert('复制失败')); }
     function copyTxt(t) { navigator.clipboard.writeText(t).then(()=>alert('复制成功')).catch(()=>alert('复制失败')); }
+    
+    // 【修改点】后台管理逻辑
     function showAdminPanel() { 
-        if(prompt('密码')===CONFIG.ADMIN_PWD) document.getElementById('adminPage').classList.remove('hidden');
-        else alert('错误');
+        document.getElementById('verifyPage').classList.add('hidden');
+        document.getElementById('adminPage').classList.remove('hidden');
+    }
+    
+    function checkAdmin() {
+        const pwd = document.getElementById('adminPwd').value;
+        if(pwd === CONFIG.ADMIN_PWD) {
+            document.getElementById('adminContent').style.display = 'block';
+            document.getElementById('dbView').value = CARD_DATABASE.join(',\n');
+        } else {
+            alert('❌ 密码错误');
+        }
     }
 </script>
 </body>
 </html>
-
-
